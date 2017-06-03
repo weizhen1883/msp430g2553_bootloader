@@ -3,6 +3,7 @@ MCU=msp430g2553
 
 OBJECTS :=
 OBJECTS += main.o
+OBJECTS += ws2812.o
 
 GCC_PATH=/opt/local
 SUPPORT_PATH=/opt/local/msp430

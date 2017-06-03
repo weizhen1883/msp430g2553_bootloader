@@ -188,9 +188,9 @@ int main(int argc, char const *argv[]) {
 	tcflush(fd, TCIFLUSH);   /* Discards old data in the rx buffer            */
 
     printf("Reset the Chip ... \r\n");
-    ioctl(fd, TIOCMBIS, &DTR_flag);//Set RTS pin
-    usleep(10000);
-    ioctl(fd, TIOCMBIC, &DTR_flag);//Clear RTS pin
+    //ioctl(fd, TIOCMBIS, &DTR_flag);//Set DTS pin
+    //usleep(10000);
+    //ioctl(fd, TIOCMBIC, &DTR_flag);//Clear DTS pin
 
     while (stringCompaire(read_buffer, "System Booting", 14, bytes_read) != 0) {
         bytes_read = read(fd, &read_buffer, 20); /* Read the data */

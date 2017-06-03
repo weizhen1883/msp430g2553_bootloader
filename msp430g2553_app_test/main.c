@@ -1,20 +1,7 @@
 #include <msp430g2553.h>
 #include <stdint.h>
-
-// Vector table handlers
-typedef void interrupt_vector_handler(void);
-interrupt_vector_handler *PORT1_VECTOR_HANDLER = (interrupt_vector_handler *)0x0202;
-interrupt_vector_handler *PORT2_VECTOR_HANDLER = (interrupt_vector_handler *)0x0203;
-interrupt_vector_handler *ADC10_VECTOR_HANDLER = (interrupt_vector_handler *)0x0205;
-interrupt_vector_handler *USCIAB0TX_VECTOR_HANDLER = (interrupt_vector_handler *)0x0206;
-interrupt_vector_handler *USCIAB0RX_VECTOR_HANDLER = (interrupt_vector_handler *)0x0207;
-interrupt_vector_handler *TIMER0_A1_VECTOR_HANDLER = (interrupt_vector_handler *)0x0208;
-interrupt_vector_handler *TIMER0_A0_VECTOR_HANDLER = (interrupt_vector_handler *)0x0209;
-interrupt_vector_handler *WDT_VECTOR_HANDLER = (interrupt_vector_handler *)0x020A;
-interrupt_vector_handler *COMPARATORA_VECTOR_HANDLER = (interrupt_vector_handler *)0x020B;
-interrupt_vector_handler *TIMER1_A1_VECTOR_HANDLER = (interrupt_vector_handler *)0x020C;
-interrupt_vector_handler *TIMER1_A0_VECTOR_HANDLER = (interrupt_vector_handler *)0x020D;
-interrupt_vector_handler *NMI_VECTOR_HANDLER = (interrupt_vector_handler *)0x020E;
+#include "ozino.h"
+#include "ws2812.h"
 
 // uart functions
 void uart_write_char(char c) {
@@ -30,7 +17,11 @@ void USCI0RX_ISR(void) {
     uint8_t rx_char;
     if (IFG2 & UCA0RXIFG) {
         rx_char = UCA0RXBUF;
-        uart_write_char(rx_char);
+        if (rx_char == '\r' || rx_char == '\n') {
+            uart_write_string("\r\n");
+        } else {
+            uart_write_char(rx_char);
+        }
     }
 }
 
@@ -62,8 +53,19 @@ int main(void) {
 	uart_write_string((char *)"APP Started!! UART Ready!\r\n");
     USCIAB0RX_VECTOR_HANDLER = USCI0RX_ISR;
 
-    P1OUT |= BIT0;
+    rgb_leds_t rgb_leds;
+    rgb_color_t test_color = { .green = 55, .red = 127, .blue = 0 };
+    init_ws2812(&rgb_leds, 2, 7);
+    ws2812_color_set(&rgb_leds, 0, test_color);
+    ws2812_color_set(&rgb_leds, 1, test_color);
+    ws2812_color_set(&rgb_leds, 2, test_color);
+    ws2812_color_set(&rgb_leds, 3, test_color);
+    ws2812_color_set(&rgb_leds, 4, test_color);
+    ws2812_color_set(&rgb_leds, 5, test_color);
+    ws2812_color_set(&rgb_leds, 6, test_color);
+    ws2812_set(&rgb_leds);
 
 	__bis_SR_register(GIE + LPM4_bits);
+
 	return 0;
 }
